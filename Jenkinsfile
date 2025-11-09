@@ -9,6 +9,7 @@ pipeline {
         PROJECTID = "MY-PROJECT-ID"
         REPOSITORY = "MY-REPO"
         IMAGE = "MY-IMAGE"
+        SERVICE = "MY-SERVICE-NAME"
     }
 
     stages {
@@ -62,6 +63,22 @@ pipeline {
                                 terraform apply -auto-approve tfplan
                             '''
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Deploy latest revision') {
+            steps {
+                script {
+                    withCredentials([file(credentialsId: 'svc_jenkins_gc', variable: 'svc_jenkins')]) {
+                        withEnv(["GOOGLE_APPLICATION_CREDENTIALS=$svc_jenkins"]) {
+                            sh """
+                                gcloud run deploy ${SERVICE} \
+                                    --image ${LOCATION}-docker.pkg.dev/${PROJECTID}/${REPOSITORY}/${IMAGE}:latest \
+                                    --region ${LOCATION}
+                            """
                         }
                     }
                 }

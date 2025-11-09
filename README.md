@@ -102,3 +102,5 @@ Now if we want to add a custom domain to our Cloud Run service we need to put it
 ### Step 10: Update DNS
 Once we have our load balancer in place, all we need to do from a DNS standpoint is create a new A record wherever your domain is hosted at and point it to the external IP of your load balancer. Once the SSL cert is showing as Active you should be able to access via your custom domain.
 
+### Step 11: Deploying new revisions
+We now want to have our pipeline deploy new revisions of our application. If this was a production grade app we would go the route of A/B or Canary testing but for my use case we simply want to update all containers with the newest revision. This can be done with a simple 'gcloud run deploy' and we will still get 0 downtime and all traffic will be shifted to our newest version.
