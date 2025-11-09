@@ -74,6 +74,7 @@ resource "google_compute_backend_service" "cloudrun_backend" {
   port_name                       = "http"
   enable_cdn                      = false
   connection_draining_timeout_sec = 10
+  security_policy = google_compute_security_policy.cloudrun_security_policy.name
 
   backend {
     group = google_compute_region_network_endpoint_group.cloundrun_neg.id
@@ -101,4 +102,34 @@ resource "google_compute_global_forwarding_rule" "cloudrun_https_rule" {
   port_range            = "443"
   target                = google_compute_target_https_proxy.cloudrun_https_proxy.id
   ip_address            = google_compute_global_address.global_lb_ipv4.id
+}
+
+#### Cloud Armor Settings ####
+resource "google_compute_security_policy" "cloudrun_security_policy" {
+  name = "my-cloudarmor-policy"
+}
+
+resource "google_compute_security_policy_rule" "rate_throttle" {
+  security_policy = google_compute_security_policy.cloudrun_security_policy.name
+  description     = "Used to throttle rate request per source IP"
+  action          = "throttle"
+  priority        = 1000
+
+  match {
+    versioned_expr = "SRC_IPS_V1"
+    config {
+      src_ip_ranges = ["*"]
+    }
+  }
+
+  rate_limit_options {
+    rate_limit_threshold {
+      count        = 200
+      interval_sec = 60
+    }
+
+    conform_action = "allow"
+    exceed_action  = "deny(429)"
+    enforce_on_key = "IP"
+  }
 }

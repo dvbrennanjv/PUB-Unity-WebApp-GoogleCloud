@@ -104,3 +104,6 @@ Once we have our load balancer in place, all we need to do from a DNS standpoint
 
 ### Step 11: Deploying new revisions
 We now want to have our pipeline deploy new revisions of our application. If this was a production grade app we would go the route of A/B or Canary testing but for my use case we simply want to update all containers with the newest revision. This can be done with a simple 'gcloud run deploy' and we will still get 0 downtime and all traffic will be shifted to our newest version.
+
+### Step 12: Intro to Cloud Armor
+While we are pretty much done with this deployment, I want to introduce how to use Cloud Armor to strengthen our security. We'll create a 'google_compute_security_policy' and attach it to our backend service. We can then create rules an attach them to this policy. For my case I'm just going to introduce a limit on throttling, but you can also have policies for geo-restrictions or even set up an OWASP ruleset.
