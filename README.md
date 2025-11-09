@@ -164,5 +164,5 @@ Cloud Armor can also enforce geo restrictions or apply Google’s preconfigured 
 ---
 
 ## Author
-**Brennan Vincent**  [Resume](https://resume.brennanjvincent.com)
+**Brennan Vincent**  [Link to Resume](https://resume.brennanjvincent.com)  
 Cloud & Infrastructure Engineer | Unity Developer | DevOps Enthusiast
