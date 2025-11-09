@@ -43,6 +43,9 @@ This project demonstrates a full CI/CD pipeline for deploying a Unity WebGL game
 4. **Tagging Infrastructure**
    Tagging is a best practice in infrastructure management, especially in production environments. I’ve intentionally left out tags, as tagging strategies should be tailored to your organization’s workflow and standards. I'd reccomend to define a consistent tagging policy that outlines required tags (e.g., Environment, Owner, CostCenter) and ensures meaningful metadata is applied to all resources for visibility, cost tracking, and governance.
 
+5. **Cloud Armor Policies**
+   Cloud Armor is a very powerful service that acts as a Web Application Firewall for our Cloud Run service. As Cloud Run is billed by the request, creating a good ruleset can help on cost an ensure that only the people you want accessing you application can.
+
 ---
 # Architecture Diagram
 ![Cloud Run Architecture](architecture_diagram_v1.png)
