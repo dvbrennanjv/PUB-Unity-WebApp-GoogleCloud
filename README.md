@@ -60,3 +60,8 @@ We need to now create our terraform files. Create a terraform.tf to store our pr
 - terraforrm.tf : Add a provider block an include google as well as google beta. We also want to provision a GCS bucket an point our backend to use it
 - variables.tf : add any repeatable values as variables incase we ever want to modularize this set up
 - main.tf : create a artifact registry repository resource (we will store our images here)
+
+### Step 6: Pushing images to artifact repository
+Now with our AR created an pipeline stage to create docker images, we want to push these images to GCP. We'll create 2 new pipeline stages
+- Stage 3: Authenticate to our artifact repository using the service account we created. (This should be stored in jenkins as a secret file)
+- Stage 4: Simple DockerImage.push to push the latest imaage to our repo.
