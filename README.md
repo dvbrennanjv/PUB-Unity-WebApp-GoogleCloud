@@ -60,7 +60,6 @@ This project demonstrates a full CI/CD pipeline for deploying a Unity WebGL game
 
 ## Architecture Diagram
 ![Cloud Run Architecture](architecture_diagram_v2.png)  
-*Figure 1: CI/CD pipeline and Google Cloud architecture overview.*
 
 ---
 
@@ -118,25 +117,25 @@ This makes the service publicly accessible via HTTPS.
 Add a Jenkins stage to build and apply all resources defined in `main.tf`.
 
 Example commands:
-- `terraform fmt` – formats the Terraform files  
-- `terraform init` – initializes providers and backends  
-- `terraform plan` – previews the infrastructure changes  
-- `terraform apply -auto-approve` – applies and provisions resources
+- `terraform fmt` : formats the Terraform files  
+- `terraform init` : initializes providers and backends  
+- `terraform plan` : previews the infrastructure changes  
+- `terraform apply -auto-approve` : applies and provisions resources
 
 ### Step 9: Load Balancer Configuration
 To use a custom domain with your Cloud Run service, create a global HTTPS load balancer in `main.tf`.
 
 Provision the following resources:
-- `google_compute_global_address` – Global static IPv4 address for the load balancer frontend  
-- `google_compute_region_network_endpoint_group` – Serverless NEG referencing the Cloud Run service  
-- `google_compute_managed_ssl_certificate` – Google-managed SSL certificate for HTTPS  
+- `google_compute_global_address` : Global static IPv4 address for the load balancer frontend  
+- `google_compute_region_network_endpoint_group` : Serverless NEG referencing the Cloud Run service  
+- `google_compute_managed_ssl_certificate` : Google-managed SSL certificate for HTTPS  
 - `google_compute_backend_service` – Backend definition pointing to the serverless NEG  
-- `google_compute_url_map` – Routing rules (default route points to the backend service)  
-- `google_compute_target_https_proxy` – Handles HTTPS termination and connects to the URL map  
-- `google_compute_global_forwarding_rule` – Routes incoming traffic on port 443 to the HTTPS proxy
+- `google_compute_url_map` : Routing rules (default route points to the backend service)  
+- `google_compute_target_https_proxy` : Handles HTTPS termination and connects to the URL map  
+- `google_compute_global_forwarding_rule` : Routes incoming traffic on port 443 to the HTTPS proxy
 
 ### Step 10: Update DNS
-After provisioning the load balancer, create an **A record** wherever your domain is hosted (e.g., Azure DNS).  
+After provisioning the load balancer, create an **A record** wherever your domain is hosted.  
 Point it to the external IP of your load balancer.  
 Once the SSL certificate status is **ACTIVE**, your app should be accessible via your custom domain.
 
@@ -146,11 +145,11 @@ This updates all running containers with the latest version without downtime.
 For production environments, you could extend this with canary or blue-green deployment strategies.
 
 ### Step 12: Intro to Cloud Armor
-Finally, you can strengthen security by adding Cloud Armor.  
+Finally, we can strengthen our security by adding Cloud Armor.  
 Create a `google_compute_security_policy` and attach it to your backend service.  
 Then create one or more `google_compute_security_policy_rule` blocks for specific protections.
 
-Example: a throttling policy to limit requests per IP or rate-limit heavy asset downloads.  
+I'm going to use a throttling policy to limit requests per IP or rate-limit heavy asset downloads.  
 Cloud Armor can also enforce geo restrictions or apply Google’s preconfigured OWASP rulesets for web protection.
 
 ---
@@ -165,6 +164,5 @@ Cloud Armor can also enforce geo restrictions or apply Google’s preconfigured 
 ---
 
 ## Author
-**Brennan Vincent**  
+**Brennan Vincent**  [Resume](https://resume.brennanjvincent.com)
 Cloud & Infrastructure Engineer | Unity Developer | DevOps Enthusiast
-[Resume](https://resume.brennanjvincent.com)
