@@ -50,7 +50,13 @@ Create a new service account in GCP and create a JSON key with it as we will let
 
 ### Step 4: DockerFile creation and first pipeline stages
 Create a basic Dockerfile using nginx:alpine as our base and copying our nginx.conf and unity build files to their respective locations. We can expose 8080 on the container.
-In our Jenkinsfile we will set up our environment variables required for building the image *LOCATION* , *PROJECT ID*, *REPOSITORY*, and *IMAGE*
+In our Jenkinsfile we will set up our environment variables required for building the image *LOCATION* , *PROJECT ID*, *REPOSITORY*, and *IMAGE*.  
 Pipeline stages we are adding are
 - Stage 1 : Clone our main branch using our Github SSH key we created earlier.
 - Stage 2 : Docker.Build step that uses our Dockerfile to build an image
+
+### Step 5: Terraform Set-Up
+We need to now create our terraform files. Create a terraform.tf to store our provider info, a main.tf for resources and then a variables.tf for any variables. I've put this all under an infrastructure folder.
+- terraforrm.tf : Add a provider block an include google as well as google beta. We also want to provision a GCS bucket an point our backend to use it
+- variables.tf : add any repeatable values as variables incase we ever want to modularize this set up
+- main.tf : create a artifact registry repository resource (we will store our images here)
