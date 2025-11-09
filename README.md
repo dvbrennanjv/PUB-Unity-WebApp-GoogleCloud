@@ -1,5 +1,5 @@
 # Unity Web App hosted in Google Cloud
-This project is a full stack, cloud native deployment of how to host a unity WebGL project in Google Cloud.
+This project demonstrates a full CI/CD pipeline for deploying a Unity WebGL game as a containerized web application on Google Cloud Run, with Terraform-managed infrastructure, a global HTTPS load balancer, and a custom domain secured via Google Managed SSL
 ---
 
 ## Technologies Used
@@ -51,6 +51,7 @@ Create a new service account in GCP and create a JSON key with it as we will let
 ### Step 4: DockerFile creation and first pipeline stages
 Create a basic Dockerfile using nginx:alpine as our base and copying our nginx.conf and unity build files to their respective locations. We can expose 8080 on the container.
 In our Jenkinsfile we will set up our environment variables required for building the image *LOCATION* , *PROJECT ID*, *REPOSITORY*, and *IMAGE*.  
+
 Pipeline stages we are adding are
 - Stage 1 : Clone our main branch using our Github SSH key we created earlier.
 - Stage 2 : Docker.Build step that uses our Dockerfile to build an image
@@ -67,7 +68,7 @@ Now with our AR created an pipeline stage to create docker images, we want to pu
 - Stage 4: Simple DockerImage.push to push the latest imaage to our repo.
 
 ### Step 7: Creating our Cloudrun Service
-Lets create a cloudrun v2 service in main.tf and expose port 8080 as well as set our desired min/max amount of instances.
+Lets create a cloudrun v2 service in main.tf and expose port 8080 as well as set our desired min/max amount of instances.  
 We also need to create a cloudrun v2 iam member an give the run.invoker role to everyone. This allows anyone to access our service.
 
 ### Step 8: Terraform Build Pipeline Stage
@@ -76,3 +77,17 @@ We need to create a stage in our pipeline to build all of our resources in main.
 - terraform init (initializes our providers)
 - terraform plan (creates a plan of what we are building)
 - terraform apply -auto-approve (builds the infrastructure)
+
+### Step 9: Load Balancer configuration
+Now if we want to add a custom domain to our Cloud Run service we need to put it behind an global load balancer. In main.tf we are going to provision a few resources to get this set up
+- google_compute_global_address : Global static IPv4 address for the load balancer frontend.
+- google_compute_region_network_endpoint_group : Serverless NEG that references the Cloud Run service.
+- google_compute_managed_ssl_certificate : Google-managed certificate for HTTPS (automatically provisioned and renewed).
+- google_compute_backend_service : Backend definition that points to the serverless NEG.
+- google_compute_url_map — Routing rules; default route points to the backend service.
+- google_compute_target_https_proxy : Handles HTTPS termination and connects to the URL map.
+- google_compute_global_forwarding_rule : Maps incoming traffic on port 443 to the HTTPS proxy.
+
+### Step 10: Update DNS
+Once we have our load balancer in place, all we need to do from a DNS standpoint is create a new A record wherever your domain is hosted at and point it to the external IP of your load balancer. Once the SSL cert is showing as Active you should be able to access via your custom domain.
+

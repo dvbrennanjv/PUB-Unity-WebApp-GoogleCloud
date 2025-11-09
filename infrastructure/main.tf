@@ -37,3 +37,68 @@ resource "google_cloud_run_v2_service_iam_member" "allow_public" {
   member   = "allUsers"
 
 }
+
+## LOAD BALANCER SET UP
+# Create an external IP to use for our load balancer
+resource "google_compute_global_address" "global_lb_ipv4" {
+  name         = "global-lb-ipv4"
+  address_type = "EXTERNAL"
+  project      = var.project_id
+  ip_version   = "IPV4"
+
+}
+
+# Serverless NEG
+resource "google_compute_region_network_endpoint_group" "cloundrun_neg" {
+  name                  = "my-cloudrun-neg"
+  region                = "us-west2"
+  network_endpoint_type = "SERVERLESS"
+  cloud_run {
+    service = google_cloud_run_v2_service.unity_container_run.name
+  }
+}
+
+# SSL cert to use for our load balancer
+resource "google_compute_managed_ssl_certificate" "cloundrun_lb_cert" {
+  provider = google-beta
+  name     = "my-ssl-cert"
+  managed {
+    domains = [var.domain_name]
+  }
+}
+
+# The actual backend service
+resource "google_compute_backend_service" "cloudrun_backend" {
+  name                            = "my-unity-backend"
+  protocol                        = "HTTP"
+  port_name                       = "http"
+  enable_cdn                      = false
+  connection_draining_timeout_sec = 10
+
+  backend {
+    group = google_compute_region_network_endpoint_group.cloundrun_neg.id
+  }
+}
+
+# URL map for routing (just having a default here)
+resource "google_compute_url_map" "cloudrun_url_map" {
+  name            = "my-unity-url-map"
+  default_service = google_compute_backend_service.cloudrun_backend.id
+}
+
+# HTTP Proxy to tie together our URL map withthe SSL cert
+resource "google_compute_target_https_proxy" "cloudrun_https_proxy" {
+  name             = "my-unity-https-proxy"
+  url_map          = google_compute_url_map.cloudrun_url_map.id
+  ssl_certificates = [google_compute_managed_ssl_certificate.cloundrun_lb_cert.id]
+}
+
+# Forwarding rule
+resource "google_compute_global_forwarding_rule" "cloudrun_https_rule" {
+  name                  = "my-unity-https-forwarding-rule"
+  ip_protocol           = "TCP"
+  load_balancing_scheme = "EXTERNAL"
+  port_range            = "443"
+  target                = google_compute_target_https_proxy.cloudrun_https_proxy.id
+  ip_address            = google_compute_global_address.global_lb_ipv4.id
+}
