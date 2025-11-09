@@ -31,6 +31,17 @@ This project demonstrates a full CI/CD pipeline for deploying a Unity WebGL game
 ---
 
 ## Security & Best Practices
+1. **Keep Bucket Names Private**  
+   Bucket names should always be stored in a 'terraform.tfvars' or a 'locals.tf" file and should be part of your .gitignore. Public exposure could lead to brute force object discovery or abuse
+
+2. **Use Principle of Least Priviledge**  
+   When creating your *Service Account* in GCP, only give it permissions to do the task required. You should not overpermission this account.
+
+3. **Terraform State**  
+   Terraform state should always be part of your .gitignore if being stored locally. I would reccomend to use a remote backend like a *GCS Bucket* and then limiting access on that bucket. Terrafrom state can contain sensitive information like public IPs so always best to limit access to it.
+
+4. **Tagging Infrastructure**
+   Tagging is a best practice in infrastructure management, especially in production environments. I’ve intentionally left out tags, as tagging strategies should be tailored to your organization’s workflow and standards. I'd reccomend to define a consistent tagging policy that outlines required tags (e.g., Environment, Owner, CostCenter) and ensures meaningful metadata is applied to all resources for visibility, cost tracking, and governance.
 
 ---
 # Architecture Diagram
