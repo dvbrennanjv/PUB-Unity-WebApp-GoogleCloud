@@ -65,3 +65,14 @@ We need to now create our terraform files. Create a terraform.tf to store our pr
 Now with our AR created an pipeline stage to create docker images, we want to push these images to GCP. We'll create 2 new pipeline stages
 - Stage 3: Authenticate to our artifact repository using the service account we created. (This should be stored in jenkins as a secret file)
 - Stage 4: Simple DockerImage.push to push the latest imaage to our repo.
+
+### Step 7: Creating our Cloudrun Service
+Lets create a cloudrun v2 service in main.tf and expose port 8080 as well as set our desired min/max amount of instances.
+We also need to create a cloudrun v2 iam member an give the run.invoker role to everyone. This allows anyone to access our service.
+
+### Step 8: Terraform Build Pipeline Stage
+We need to create a stage in our pipeline to build all of our resources in main.tf. We can use the same service account we made earlier and create a new stage that runs the following
+- terraform fmt (to clean up our file)
+- terraform init (initializes our providers)
+- terraform plan (creates a plan of what we are building)
+- terraform apply -auto-approve (builds the infrastructure)
